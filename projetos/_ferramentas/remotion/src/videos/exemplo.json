@@ -1,0 +1,117 @@
+{
+ "titulo": "Exemplo sem vídeo (troque fonte pelo SDR do bruto)",
+ "fonte": null,
+ "cortes": [
+  {
+   "de": 0,
+   "ate": 3
+  },
+  {
+   "de": 3.2,
+   "ate": 6
+  }
+ ],
+ "palavras": [
+  {
+   "texto": "Esse",
+   "ini": 0.0,
+   "fim": 0.35
+  },
+  {
+   "texto": "é",
+   "ini": 0.4,
+   "fim": 0.75
+  },
+  {
+   "texto": "um",
+   "ini": 0.8,
+   "fim": 1.15
+  },
+  {
+   "texto": "exemplo",
+   "ini": 1.2000000000000002,
+   "fim": 1.5500000000000003
+  },
+  {
+   "texto": "de",
+   "ini": 1.6,
+   "fim": 1.9500000000000002
+  },
+  {
+   "texto": "legenda",
+   "ini": 2.0,
+   "fim": 2.35
+  },
+  {
+   "texto": "palavra",
+   "ini": 2.4000000000000004,
+   "fim": 2.7500000000000004
+  },
+  {
+   "texto": "a",
+   "ini": 2.8000000000000003,
+   "fim": 3.1500000000000004
+  },
+  {
+   "texto": "palavra",
+   "ini": 3.2,
+   "fim": 3.5500000000000003
+  },
+  {
+   "texto": "no",
+   "ini": 3.6,
+   "fim": 3.95
+  },
+  {
+   "texto": "modelo",
+   "ini": 4.0,
+   "fim": 4.35
+  }
+ ],
+ "textos": [
+  {
+   "tipo": "gancho",
+   "linhas": [
+    "Seu gancho",
+    "aqui em cima"
+   ],
+   "destaque": "aqui em cima",
+   "ini": 0,
+   "fim": 2.8
+  },
+  {
+   "tipo": "cards",
+   "itens": [
+    {
+     "texto": "Um",
+     "emoji": "1️⃣",
+     "em": 3.3
+    },
+    {
+     "texto": "Dois",
+     "emoji": "2️⃣",
+     "em": 4.2
+    },
+    {
+     "texto": "Três",
+     "emoji": "3️⃣",
+     "em": 5.1
+    }
+   ],
+   "ini": 3.2,
+   "fim": 6
+  }
+ ],
+ "punch": [
+  1.2
+ ],
+ "sfx": [
+  {
+   "arquivo": "whoosh.wav",
+   "em": 0,
+   "volume": 0.5
+  }
+ ],
+ "musica": null,
+ "guias": true
+}

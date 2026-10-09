@@ -15,7 +15,7 @@ ganchos/CTAs/hashtags do nicho) mora lá e vale mais que qualquer regra genéric
 - `brutos/` — material original gravado. NUNCA editar nem apagar arquivos daqui.
 - `roteiros/` — roteiros, ganchos, legendas de post e hashtags (`<slug>.md`).
 - `projetos/<slug>/` — trabalho de um vídeo: cortes intermediários, transcrição (`.srt`/`.ass`), notas.
-- `projetos/_ferramentas/` — ferramentas reutilizáveis (broll-kit, sfx, rastreio, player).
+- `projetos/_ferramentas/` — ferramentas reutilizáveis (remotion, broll-kit, sfx, rastreio, player).
 - `exports/` — versões finais prontas para postar: `<slug>_v<N>.mp4`.
 - `assets/` — fontes, músicas, logos, b-roll, sfx e o modelo do whisper.
 - `estudio/` — processo comum (painel, calendário do desafio, ganchos, legendas, checklist, técnicas). Vai pro git.
@@ -40,6 +40,8 @@ Nunca coloque nada de `canal/`, `brutos/`, `exports/`, `roteiros/` ou `projetos/
 - Ao postar, marcar ✅ na nota `desafio-100-dias` e atualizar o placar.
 
 ## Ferramentas
+- Edição: prefira o **Remotion** (`projetos/_ferramentas/remotion/`, ver README): um `src/videos/<slug>.json`
+  por vídeo, Studio em http://localhost:3100 (abrir num portal do Maestri) e `scripts/render.sh` para exportar.
 - Use SEMPRE o ffmpeg completo: `/opt/homebrew/opt/ffmpeg-full/bin/ffmpeg` (e `.../ffprobe`, `.../ffplay`).
   Ele tem `libass` (filtros `subtitles`/`ass`) e `drawtext`. O `ffmpeg` do PATH é o build simples, sem esses filtros.
 - Transcrição: `whisper-cli` (whisper.cpp, usa a GPU do Mac). Modelo: `assets/modelos/ggml-large-v3-turbo.bin`.

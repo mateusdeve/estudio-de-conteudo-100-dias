@@ -28,3 +28,11 @@ projetos/_ferramentas/broll-kit/gerar-*.sh
 .DS_Store
 *.tmp
 __pycache__/
+
+# ── Remotion: dependências, links locais e dados de cada vídeo ──
+**/node_modules/
+projetos/_ferramentas/remotion/public/*
+!projetos/_ferramentas/remotion/public/.gitkeep
+projetos/_ferramentas/remotion/src/videos/*.json
+!projetos/_ferramentas/remotion/src/videos/exemplo.json
+projetos/_ferramentas/remotion/out/

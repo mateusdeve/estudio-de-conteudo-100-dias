@@ -18,7 +18,7 @@ Você ──grava──▶ brutos/ ──▶ ✂️ Navalha (edição) ──▶
 | `canal/` | **O seu canal**, criado a partir do modelo | ❌ só na sua máquina |
 | `scripts/` | Preparação, gerador do desafio, sincronização com o canvas | ✅ |
 | `.maestri/roles/` | Os 4 papéis do time (Roteirista, Editor, Legendador, Revisor) | ✅ |
-| `projetos/_ferramentas/` | broll-kit (b-roll animado em HTML → mp4), SFX, rastreio de mãos, player | ✅ |
+| `projetos/_ferramentas/` | remotion (edição do Reel em código), broll-kit (b-roll animado em HTML → mp4), SFX, rastreio de mãos, player | ✅ |
 | `brutos/` `roteiros/` `projetos/<slug>/` `exports/` `assets/` | O trabalho de cada vídeo | ❌ |
 
 ## Começando
@@ -26,8 +26,19 @@ Você ──grava──▶ brutos/ ──▶ ✂️ Navalha (edição) ──▶
 **1. Ferramentas** (Mac com Apple Silicon)
 
 ```sh
-brew install ffmpeg-full whisper-cpp
+brew install ffmpeg-full whisper-cpp node
 ```
+
+Editor de vídeo (Remotion, o caminho padrão de edição; detalhes em `projetos/_ferramentas/remotion/README.md`):
+
+```sh
+cd projetos/_ferramentas/remotion
+npm install
+scripts/preparar.sh      # liga as fontes, os SFX e as músicas de assets/
+```
+
+A fonte padrão é a [Familjen Grotesk](https://fonts.google.com/specimen/Familjen+Grotesk) (grátis): baixe e coloque
+os `.ttf` (`FamiljenGrotesk-500.ttf`, `-600`, `-700`) em `assets/fontes/`. Para usar outra, troque em `src/estilo.ts`.
 
 Opcionais, só para o 🎬 nível completo:
 
