@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Contador de commits</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .pontos { position: absolute; inset: -100px;
+    background-image: radial-gradient(circle, #1f232b 2px, transparent 2.4px); background-size: 34px 34px; }
+  .periodo { position: absolute; left: 0; right: 120px; top: 420px; text-align: center; font-size: 52px; font-weight: 500; color: var(--texto-2); }
+  .numero { position: absolute; left: 0; right: 120px; top: 520px; text-align: center; font-size: 300px; font-weight: 700;
+    color: var(--destaque); line-height: 1; letter-spacing: -8px; font-variant-numeric: tabular-nums; }
+  .rotulo { position: absolute; left: 0; right: 120px; top: 880px; text-align: center; font-size: 76px; font-weight: 700; letter-spacing: 10px; }
+  .grade { position: absolute; left: 70px; top: 1100px; display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 38px); gap: 6px; }
+  .grade i { width: 38px; height: 38px; border-radius: 8px; background: #161a21; display: block; }
+  .meses { position: absolute; left: 70px; top: 1420px; height: 30px; width: 880px; font-size: 24px; color: var(--texto-3); }
+  .meses span { position: absolute; }
+</style>
+</head>
+<body>
+<div class="palco" id="palco">
+  <div class="pontos"></div>
+  <div class="periodo" id="periodo"></div>
+  <div class="numero" id="numero">0</div>
+  <div class="rotulo" id="rotulo"></div>
+  <div class="grade" id="grade"></div>
+  <div class="meses" id="meses"></div>
+</div>
+<script src="lib.js"></script>
+<script>
+// ?dados=<arquivo>  usa DADOS.contador { total, rotulo, periodo, inicio, fim, porDia }
+// A grade (um quadrado por dia) acende em ordem cronológica junto com o número.
+const T_INI = 0.2, T_FIM = 2.6;
+const MESES = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+
+window.pronto = carregarDados().then(() => {
+  const C = window.DADOS.contador;
+  document.getElementById("periodo").textContent = C.periodo;
+  document.getElementById("rotulo").textContent = C.rotulo;
+  const numero = document.getElementById("numero");
+
+  // dias do domingo da semana inicial até o fim
+  const dia = s => new Date(s + "T12:00:00Z");
+  const ini = dia(C.inicio), fim = dia(C.fim);
+  const d0 = new Date(ini); d0.setUTCDate(d0.getUTCDate() - d0.getUTCDay());
+  const grade = document.getElementById("grade"), meses = document.getElementById("meses");
+  const cel = [];
+  let acum = 0, semana = 0, mesAnt = -1;
+  for (let d = new Date(d0); d <= fim; d.setUTCDate(d.getUTCDate() + 1)) {
+    const k = d.toISOString().slice(0, 10);
+    const el = document.createElement("i");
+    grade.appendChild(el);
+    if (d.getUTCDay() === 0 && d > d0) semana++;
+    const n = d >= ini ? (C.porDia[k] || 0) : -1;
+    if (n > 0) { acum += n; cel.push({ el, n, ate: acum }); }
+    if (d.getUTCDate() <= 7 && d.getUTCDay() === 0 && d.getUTCMonth() !== mesAnt) {
+      mesAnt = d.getUTCMonth();
+      const m = document.createElement("span"); m.textContent = MESES[mesAnt]; m.style.left = semana * 44 + "px"; meses.appendChild(m);
+    }
+  }
+  guias(document.getElementById("palco"));
+
+  window.CENA = { duracao: parseFloat(Q.get("dur") || "4"), fps: 30 };
+  window.render = t => {
+    const k = ease.out(prog(t, T_INI, T_FIM - T_INI));
+    const v = Math.round(k * C.total);
+    numero.textContent = v;
+    // "pop" quando chega no total
+    const p = prog(t, T_FIM, 0.35);
+    const esc = p > 0 && p < 1 ? 1 + 0.07 * Math.sin(p * Math.PI) : 1;
+    numero.style.transform = `scale(${esc})`;
+    numero.style.textShadow = `0 0 ${40 + 40 * (p > 0 ? 1 - p : 0)}px rgba(255,178,62,${p > 0 ? 0.25 + 0.35 * (1 - p) : 0.2})`;
+    for (const c of cel) {
+      const ligado = c.ate <= v || (v > 0 && c.ate - c.n < v);
+      const a = Math.min(1, 0.3 + c.n / 30);
+      c.el.style.background = ligado ? `rgba(255,178,62,${a})` : "#161a21";
+    }
+    const kt = ease.out(prog(t, 0, 0.4));
+    for (const id of ["periodo", "rotulo"]) document.getElementById(id).style.opacity = kt;
+  };
+  if (!navigator.webdriver) previa();
+});
+</script>
+</body>
+</html>

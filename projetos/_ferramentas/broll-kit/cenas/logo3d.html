@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Logo 3D</title>
+<style>
+  html, body { margin: 0; background: transparent; overflow: hidden; }
+  canvas { display: block; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "/node_modules/three/build/three.module.js",
+  "three/addons/": "/node_modules/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<script type="module">
+// Logo de marca extrudado em 3D, girando no eixo Y, fundo TRANSPARENTE.
+// Precisa ser servido por HTTP (render.mjs --http). Parâmetros:
+//   svg=<caminho do SVG a partir de />   ex.: /node_modules/simple-icons-13/icons/openai.svg
+//   face=<hex>  lado=<hex>   cores da frente e da lateral/bisel
+//   metal=<0..1> rug=<0..1>  metalness e roughness da frente
+//   amb=<0..2>  reflexos do ambiente (padrão 0,6; aprovado pelo Maestro em 07/10: Codex prateado c/ contorno preto, Claude cobre)
+//   volta=<s>   segundos por volta (padrão 1,5)   tam=<px> (padrão 720)   prof=<profundidade, padrão 3,2>
+import * as THREE from "three";
+import { SVGLoader } from "three/addons/loaders/SVGLoader.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+const Q = new URLSearchParams(location.search);
+const TAM = parseInt(Q.get("tam") || "720");
+const VOLTA = parseFloat(Q.get("volta") || "1.5");
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true, premultipliedAlpha: false });
+renderer.setPixelRatio(1);
+renderer.setSize(TAM, TAM);
+renderer.setClearColor(0x000000, 0);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.9;
+document.body.appendChild(renderer.domElement);
+
+const cena = new THREE.Scene();
+const pm = new THREE.PMREMGenerator(renderer);
+cena.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;   // reflexos de estúdio (deixam a face prateada)
+cena.environmentIntensity = parseFloat(Q.get("amb") || "0.6");
+
+const cam = new THREE.PerspectiveCamera(28, 1, 0.1, 200);
+cam.position.set(0, 0, 62);
+
+// luz principal, preenchimento e DUAS rim lights atrás (contorno brilhante na silhueta)
+// luzes rasantes (pelos lados): de frente, o reflexo especular da face plana não bate na câmera e não lava a cor
+const key = new THREE.DirectionalLight(0xfff4ea, 1.8); key.position.set(-32, 22, 9); cena.add(key);
+const fill = new THREE.DirectionalLight(0xdfe8ff, 0.5); fill.position.set(30, -12, 7); cena.add(fill);
+const rimA = new THREE.DirectionalLight(0xffffff, 3.2); rimA.position.set(22, 10, -26); cena.add(rimA);
+const rimB = new THREE.DirectionalLight(0xffffff, 2.4); rimB.position.set(-22, -8, -26); cena.add(rimB);
+
+const svgTxt = await (await fetch(Q.get("svg"))).text();
+const data = new SVGLoader().parse(svgTxt);
+const formas = [];
+for (const p of data.paths) for (const s of SVGLoader.createShapes(p)) formas.push(s);
+const prof = parseFloat(Q.get("prof") || "3.2");
+const geo = new THREE.ExtrudeGeometry(formas, {
+  depth: prof, bevelEnabled: true, bevelThickness: 0.55, bevelSize: 0.32, bevelSegments: 6, curveSegments: 48,
+});
+geo.computeBoundingBox();
+const bb = geo.boundingBox, c = new THREE.Vector3(); bb.getCenter(c);
+geo.translate(-c.x, -c.y, -c.z);
+geo.computeVertexNormals();
+
+const frente = new THREE.MeshPhysicalMaterial({
+  color: new THREE.Color(Q.get("face") || "#ffffff"), metalness: parseFloat(Q.get("metal") || "0.25"),
+  roughness: parseFloat(Q.get("rug") || "0.45"), clearcoat: 0, envMapIntensity: parseFloat(Q.get("refl") || "0.12"),
+  // face plana de frente espelha o ambiente atrás da câmera e lava a cor: pouco reflexo na face, muito no bisel
+});
+const lado = new THREE.MeshPhysicalMaterial({
+  color: new THREE.Color(Q.get("lado") || "#202020"), metalness: 0.6, roughness: 0.32, clearcoat: 0.6,
+});
+const malha = new THREE.Mesh(geo, [frente, lado]);
+malha.rotation.x = Math.PI;          // SVG tem y para baixo: girar 180° em X (escala negativa inverte as normais)
+const grupo = new THREE.Group(); grupo.add(malha);
+const tamLogo = Math.max(bb.max.x - bb.min.x, bb.max.y - bb.min.y);
+grupo.scale.setScalar(22 / tamLogo); // ocupa ~70% do quadro, sobrando margem para o bisel girar
+cena.add(grupo);
+
+window.CENA = { duracao: VOLTA, fps: 30 };
+window.render = t => {
+  const a = (t / VOLTA) * Math.PI * 2;
+  grupo.rotation.y = a;
+  grupo.rotation.x = -0.12;          // leve inclinação: mostra o topo do bisel
+  renderer.render(cena, cam);
+};
+window.render(0);
+window.pronto = Promise.resolve();
+</script>
+</body>
+</html>

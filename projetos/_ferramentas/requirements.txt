@@ -1,0 +1,5 @@
+# venv do rastreio de mãos/rosto: python3 -m venv venv && venv/bin/pip install -r requirements.txt
+mediapipe==1.1.0
+opencv-python==5.0.0.93
+numpy==2.5.3
+scipy==1.18.1

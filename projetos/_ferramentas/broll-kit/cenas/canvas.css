@@ -1,0 +1,39 @@
+/* Canvas estilo Maestri */
+.mundo { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 0 0; }
+.pontos {
+  position: absolute; left: -2200px; top: -2200px; right: -2200px; bottom: -2200px;
+  background-image: radial-gradient(circle, #2b303b 2px, transparent 2.4px);
+  background-size: 34px 34px;
+  background-position: 0 0;
+}
+.cordas { position: absolute; left: 0; top: 0; overflow: visible; }
+.corda { fill: none; stroke: #3a414e; stroke-width: 4; stroke-linecap: round; }
+.porta { fill: #12151b; stroke: #4a5262; stroke-width: 3; }
+.pulso { fill: var(--destaque); filter: drop-shadow(0 0 10px var(--destaque)) drop-shadow(0 0 22px rgba(255,178,62,.6)); }
+.rastro { fill: var(--destaque); }
+
+.terminal {
+  --brilho: 0; --apagado: 0;
+  position: absolute;
+  background: var(--painel);
+  border: 2px solid color-mix(in srgb, var(--destaque) calc(var(--brilho) * 100%), var(--painel-borda));
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.55), 0 0 calc(var(--brilho) * 40px) rgba(255,178,62, calc(var(--brilho) * .45));
+  overflow: hidden;
+  filter: brightness(calc(1 - var(--apagado) * .78)) blur(calc(var(--apagado) * 2.5px));
+}
+.cab {
+  height: 52px; display: flex; align-items: center; gap: 12px; padding: 0 16px;
+  background: #171b22; border-bottom: 2px solid #20252e;
+}
+.luzes { display: flex; gap: 7px; }
+.luzes i { width: 11px; height: 11px; border-radius: 50%; background: #343a46; display: block; }
+.nome { font-weight: 700; font-size: 27px; color: var(--texto); letter-spacing: -.3px; }
+.motor { margin-left: auto; font-size: 17px; color: var(--texto-3); font-weight: 500; }
+.corpo { padding: 12px 16px; font-size: 19px; line-height: 30px; white-space: pre; }
+.l { color: var(--texto-2); overflow: hidden; }
+.l.cmd { color: var(--texto); font-weight: 500; }
+.l.ok { color: var(--texto); }
+.l.msg { color: var(--destaque); }
+.l em { font-style: normal; color: var(--destaque); font-weight: 700; }
+.cur { display: inline-block; width: 10px; height: 22px; background: var(--destaque); vertical-align: -4px; margin-left: 2px; }

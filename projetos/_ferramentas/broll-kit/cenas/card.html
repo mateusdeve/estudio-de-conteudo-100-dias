@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Cartão de código</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .pontos { position: absolute; inset: -100px;
+    background-image: radial-gradient(circle, #1f232b 2px, transparent 2.4px); background-size: 34px 34px; }
+  .card { position: absolute; left: 80px; width: 850px; top: 560px; border-radius: 22px; overflow: hidden;
+    background: var(--painel); border: 2px solid var(--painel-borda); box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+  .aba { height: 74px; display: flex; align-items: center; gap: 14px; padding: 0 26px; background: #171b22; border-bottom: 2px solid #20252e; font-size: 28px; color: var(--texto-2); }
+  .aba .luzes { display: flex; gap: 9px; margin-right: 10px; }
+  .aba .luzes i { width: 14px; height: 14px; border-radius: 50%; background: #343a46; display: block; }
+  .corpo { padding: 34px 30px 40px 0; display: grid; grid-template-columns: 90px 1fr; row-gap: 10px; font-size: 50px; line-height: 66px; }
+  .num { text-align: right; padding-right: 26px; color: var(--texto-3); font-size: 34px; }
+  .cod { white-space: pre; color: var(--texto-2); }
+  .cod.forte { color: var(--texto); }
+  .marca { position: relative; display: inline-block; }
+  .marca::before { content: ""; position: absolute; left: -8px; right: -8px; top: 6px; bottom: 4px; border-radius: 8px;
+    background: var(--destaque); transform-origin: 0 50%; transform: scaleX(var(--k, 0)); z-index: 0; }
+  .marca span { position: relative; z-index: 1; }
+  .titulo { position: absolute; left: 70px; width: 880px; top: 1180px; text-align: center; font-size: 88px; font-weight: 700; letter-spacing: -1px; }
+  .titulo b { color: var(--destaque); }
+</style>
+</head>
+<body>
+<div class="palco" id="palco">
+  <div class="pontos"></div>
+  <div class="card" id="card">
+    <div class="aba"><span class="luzes"><i></i><i></i><i></i></span><span id="arquivo"></span></div>
+    <div class="corpo" id="corpo"></div>
+  </div>
+  <div class="titulo" id="titulo"></div>
+</div>
+<script src="lib.js"></script>
+<script>
+// ?dados=<arquivo>  usa DADOS.card { arquivo, linha, codigo:[até 3 linhas], destaque, titulo }
+window.pronto = carregarDados().then(() => {
+  const C = window.DADOS.card;
+  document.getElementById("arquivo").textContent = C.arquivo;
+  const corpo = document.getElementById("corpo");
+  C.codigo.forEach((l, i) => {
+    const num = i === 0 ? C.linha : "";
+    let h = esc(l);
+    const forte = i > 0;
+    if (C.destaque && l.includes(C.destaque)) h = h.replace(esc(C.destaque), `<span class="marca" id="marca"><span>${esc(C.destaque)}</span></span>`);
+    corpo.insertAdjacentHTML("beforeend", `<div class="num">${num}</div><div class="cod${forte ? " forte" : ""}">${h}</div>`);
+  });
+  const titulo = document.getElementById("titulo");
+  // primeira palavra em destaque: "REGRA > PROMPT"
+  titulo.innerHTML = esc(C.titulo).replace(/^(\S+)/, "<b>$1</b>");
+  const card = document.getElementById("card"), marca = document.getElementById("marca");
+  guias(document.getElementById("palco"));
+
+  window.CENA = { duracao: parseFloat(Q.get("dur") || "4"), fps: 30 };
+  window.render = t => {
+    const kc = ease.out(prog(t, 0, 0.45));
+    const push = lerp(1, 1.03, prog(t, 0, window.CENA.duracao));
+    card.style.opacity = kc;
+    card.style.transform = `translateY(${(1 - kc) * 60}px) scale(${push})`;
+    const km = ease.inOut(prog(t, 0.75, 0.5));
+    if (marca) {
+      marca.style.setProperty("--k", km.toFixed(3));
+      marca.querySelector("span").style.color = km > 0.5 ? "#0a0b0e" : "";
+    }
+    const kt = ease.outBack(prog(t, 1.5, 0.4));
+    titulo.style.opacity = clamp(prog(t, 1.5, 0.2));
+    titulo.style.transform = `scale(${lerp(0.7, 1, kt)})`;
+  };
+  if (!navigator.webdriver) previa();
+});
+</script>
+</body>
+</html>

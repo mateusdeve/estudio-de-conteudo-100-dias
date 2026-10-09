@@ -1,0 +1,33 @@
+/* Base visual do kit de b-roll (1080x1920, fundo quase preto, 1 cor de destaque, FiraCode). */
+@font-face { font-family: "Fira"; src: url("../fonts/FiraCodeNerdFontMono-Regular.ttf"); font-weight: 400; }
+@font-face { font-family: "Fira"; src: url("../fonts/FiraCodeNerdFontMono-Medium.ttf"); font-weight: 500; }
+@font-face { font-family: "Fira"; src: url("../fonts/FiraCodeNerdFontMono-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: "Fira"; src: url("../fonts/FiraCodeNerdFontMono-Bold.ttf"); font-weight: 700; }
+
+:root {
+  --bg: #0a0b0e;
+  --painel: #12151b;
+  --painel-borda: #262b35;
+  --texto: #e8ebf0;
+  --texto-2: #8b93a3;
+  --texto-3: #555d6c;
+  --destaque: #ffb23e;      /* única cor de destaque (âmbar) */
+  --ok: #e8ebf0;            /* sem 2ª cor: "ok" usa texto claro + ✓ em destaque */
+  --mono: "Fira", "Apple Color Emoji", monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 1080px; height: 1920px; overflow: hidden;
+  background: var(--bg); color: var(--texto);
+  font-family: var(--mono);
+  -webkit-font-smoothing: antialiased;
+  font-variant-ligatures: contextual;
+}
+.palco { position: absolute; inset: 0; overflow: hidden; }
+
+/* Guias de zona segura (só com ?guias=1) */
+.guias::before, .guias::after { content: ""; position: absolute; left: 0; right: 0; background: rgba(255,0,0,.18); z-index: 999; }
+.guias::before { top: 0; height: 200px; }
+.guias::after { bottom: 0; height: 250px; }
+.guia-dir { position: absolute; top: 0; bottom: 0; right: 0; width: 120px; background: rgba(255,0,0,.18); z-index: 999; }

@@ -1,0 +1,5 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Preview</title>
+<style>html,body{margin:0;height:100%;background:#0d0f12;display:grid;place-items:center;font:14px system-ui;color:#9aa3ab}
+video{height:96vh;max-width:96vw;aspect-ratio:9/16;border-radius:14px;background:#000}</style></head>
+<body><video id="v" controls autoplay loop playsinline></video>
+<script>var v=new URLSearchParams(location.search).get("v");document.getElementById("v").src=v;document.title=v.split("/").pop();</script></body></html>

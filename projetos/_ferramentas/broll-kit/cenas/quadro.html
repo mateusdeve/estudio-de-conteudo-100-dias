@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Quadro do time</title>
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="canvas.css">
+<style>
+  /* fundo: o canvas de agentes desfocado */
+  .fundo { position: absolute; inset: 0; filter: blur(14px) brightness(.32) saturate(.8); }
+  .titulo { position: absolute; left: 70px; top: 228px; font-size: 64px; font-weight: 700; letter-spacing: -1px; }
+  .titulo b { color: var(--destaque); }
+  .lista { position: absolute; left: 70px; width: 880px; top: 340px; }
+  .item {
+    display: flex; align-items: center; gap: 26px; height: 104px; margin-bottom: 8px;
+    padding: 0 24px; border-radius: 18px;
+    background: rgba(18, 21, 27, .88); border: 2px solid var(--painel-borda);
+    transform-origin: 0 50%;
+  }
+  .emoji { font-size: 54px; width: 64px; text-align: center; font-family: "Apple Color Emoji"; line-height: 1; }
+  .txt { display: flex; flex-direction: column; gap: 2px; }
+  .item .nome { font-size: 40px; font-weight: 700; line-height: 46px; }
+  .item .func { font-size: 32px; color: var(--texto-2); line-height: 36px; }
+  .div { height: 2px; margin: 18px 4px 24px; background: linear-gradient(90deg, var(--destaque), transparent); transform-origin: 0 50%; }
+  .rodape { position: absolute; left: 70px; width: 860px; top: 1540px; font-size: 32px; line-height: 44px; color: var(--texto); text-align: left; }
+  .rodape b { color: var(--destaque); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="palco" id="palco">
+  <div class="fundo" id="fundo"></div>
+  <div class="titulo" id="titulo"></div>
+  <div class="lista" id="lista"></div>
+  <div class="rodape" id="rodape"></div>
+</div>
+<script src="lib.js"></script>
+<script src="canvas-cena.js"></script>
+<script>
+// ?dados=<arquivo>&passo=<s entre linhas>&dur=<s>  usa DADOS.quadro { titulo, agentes:[[emoji,nome,função]], divisao, rodape }
+const INICIO = 0.25, PASSO = parseFloat(Q.get("passo") || "0.4"), POP = 0.35;
+
+window.pronto = carregarDados().then(() => {
+  const D = window.DADOS, QD = D.quadro;
+  const cv = criarCanvas(document.getElementById("fundo"), D);
+  guias(document.getElementById("palco"));
+
+  const titulo = document.getElementById("titulo");
+  // destaca números no título (ex.: "QUADRO DOS 10")
+  titulo.innerHTML = esc(QD.titulo).replace(/(\d+)/g, "<b>$1</b>");
+  const rodape = document.getElementById("rodape");
+  rodape.innerHTML = esc(QD.rodape).replace(/(\d+)/g, "<b>$1</b>").replace(" · ", "<br>");
+
+  const lista = document.getElementById("lista");
+  const itens = [];
+  QD.agentes.forEach(([emoji, nome, func], i) => {
+    if (QD.divisao && i === QD.divisao) {
+      const d = document.createElement("div"); d.className = "div"; lista.appendChild(d); itens.push({ el: d, i, div: true });
+    }
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML = `<span class="emoji">${emoji}</span><span class="txt"><span class="nome">${esc(nome)}</span><span class="func">${esc(func)}</span></span>`;
+    lista.appendChild(el);
+    itens.push({ el, i });
+  });
+
+  const fimItens = INICIO + (QD.agentes.length - 1) * PASSO + POP;
+  window.CENA = { duracao: parseFloat(Q.get("dur") || "6"), fps: 30 };
+  window.render = t => {
+    cv.render(4 + t, { x: 540, y: 940, s: lerp(1.12, 1.05, t / window.CENA.duracao) });
+    const kt = ease.out(prog(t, 0, 0.35));
+    titulo.style.opacity = kt; titulo.style.transform = `translateY(${(1 - kt) * 24}px)`;
+    for (const it of itens) {
+      const t0 = INICIO + it.i * PASSO - (it.div ? PASSO * 0.4 : 0);
+      const k = prog(t, t0, POP);
+      if (it.div) { it.el.style.transform = `scaleX(${ease.out(k)})`; continue; }
+      const kb = ease.outBack(k);
+      it.el.style.opacity = clamp(k * 2.2);
+      it.el.style.transform = `translateX(${(1 - kb) * -40}px) scale(${lerp(0.86, 1, kb)})`;
+      // borda acende no "pop" e apaga
+      const flash = k > 0 ? Math.max(0, 1 - (t - t0) / 0.6) : 0;
+      it.el.style.borderColor = `color-mix(in srgb, var(--destaque) ${Math.round(flash * 100)}%, var(--painel-borda))`;
+    }
+    const kr = ease.out(prog(t, fimItens + 0.1, 0.4));
+    rodape.style.opacity = kr; rodape.style.transform = `translateY(${(1 - kr) * 16}px)`;
+  };
+  if (!navigator.webdriver) previa();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+# ── Pessoal: fica só na máquina de cada um ─────────────────
+canal/
+brutos/*
+exports/*
+roteiros/*
+projetos/*
+!projetos/_ferramentas/
+assets/*
+!assets/sfx/
+!**/.gitkeep
+
+# ── Ferramentas: instaláveis, não versionar ────────────────
+projetos/_ferramentas/node_modules/
+projetos/_ferramentas/venv/
+projetos/_ferramentas/modelos/
+# dados e scripts de b-roll de cada vídeo são do canal
+projetos/_ferramentas/broll-kit/dados/*
+!projetos/_ferramentas/broll-kit/dados/exemplo.js
+projetos/_ferramentas/broll-kit/gerar-*.sh
+
+# ── Maestri: os .md dos papéis são gerados com caminhos locais ──
+.maestri/*
+!.maestri/roles/
+.maestri/roles/*/*
+!.maestri/roles/*/role.json
+
+# ── Sistema ────────────────────────────────────────────────
+.DS_Store
+*.tmp
+__pycache__/

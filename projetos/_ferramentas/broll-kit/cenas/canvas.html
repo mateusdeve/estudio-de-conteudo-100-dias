@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Canvas de agentes</title>
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="canvas.css">
+<style>
+  .vinheta { position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 75% 60% at 50% 48%, transparent 55%, rgba(0,0,0,.55) 100%); }
+  .foco-vinheta { position: absolute; inset: 0; pointer-events: none; opacity: 0;
+    background: radial-gradient(ellipse 60% 32% at 44% 47%, transparent 60%, rgba(0,0,0,.75) 100%); }
+</style>
+</head>
+<body>
+<div class="palco" id="palco"><div class="vinheta"></div><div class="foco-vinheta" id="fv"></div></div>
+<script src="lib.js"></script>
+<script src="canvas-cena.js"></script>
+<script>
+// Modos:
+//   ?modo=loop                      canvas inteiro, zoom-out lento (duração = período dos dados)
+//   ?modo=spotlight&agente=<id>     zoom no terminal do agente, resto escurecido (2 s)
+// Parâmetros comuns: dados=<arquivo em dados/>, guias=1 (zonas seguras), t=<s>, play=1
+const palco = document.getElementById("palco");
+const fv = document.getElementById("fv");
+const modo = Q.get("modo") || "loop";
+
+window.pronto = carregarDados().then(() => {
+  const D = window.DADOS;
+  const cv = criarCanvas(palco, D);
+  palco.insertBefore(cv.mundo, palco.firstChild);
+  guias(palco);
+
+  if (modo === "loop") {
+    window.CENA = { duracao: D.periodo, fps: 30 };
+    window.render = t => {
+      // zoom-out lento: começa perto (centro do canvas) e termina mostrando tudo
+      const k = ease.inOut(prog(t, 0, D.periodo));
+      cv.render(t, { x: lerp(535, 520, k), y: 950, s: lerp(1.04, 0.9, k) });
+    };
+  } else {
+    const id = Q.get("agente");
+    const T = D.terminais.find(x => x.id === id);
+    const t0 = D.spotlight[id] ?? 0;
+    const cx = T.x + T.w / 2, cy = T.y + T.h / 2;
+    window.CENA = { duracao: parseFloat(Q.get("dur") || "2"), fps: 30 };
+    window.render = t => {
+      const kz = ease.outExpo(prog(t, 0, 0.7));
+      const s = lerp(1.45, 2.05, kz) + 0.05 * prog(t, 0.7, window.CENA.duracao - 0.7);
+      // já centrado no terminal; o zoom "assenta" nele
+      const cam = { x: cx, y: cy, s };
+      const escuro = ease.out(prog(t, 0, 0.5));
+      cv.render(t0 + t, cam, { foco: id, focoTela: [480, 900], escuro, incluirExtras: true });
+      fv.style.opacity = escuro.toFixed(3);
+    };
+  }
+  if (!navigator.webdriver) previa();
+});
+</script>
+</body>
+</html>
